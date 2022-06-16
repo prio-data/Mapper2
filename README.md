@@ -3,4 +3,4 @@ Update to ViewsMapper1: new functionality includes customizable scaling and labe
 
 Pip install views_mapper2 in the terminal window
 
-current latest version: 0.2.0 (Available for pip upgrade on 6/16/2022)
+current latest version: 0.2.0 (Available 6/16/2022)
