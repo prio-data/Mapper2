@@ -134,7 +134,7 @@ def add_textbox_to_ax(
     text: str,
     textsize: int,
     corner: str = "lower left",
-    corner_offset: float = 0.3,
+    corner_offset: float = 2,
     textbox_pad: float = 0.4,
 ) -> None:
     """Add bounded white textbox to ax, with url and logo.
