@@ -4,3 +4,10 @@ Update to ViewsMapper1: new functionality includes customizable scaling and labe
 Pip install views_mapper2 in the terminal window
 
 current latest version: 0.3.0 (Available 6/28/2022)
+
+
+Attribution: 
+Background tiles provided by Stamen:
+Toner map: Map tiles by Stamen Design, under CC BY 3.0. Data by OpenStreetMap, under ODbL.
+Watercolor map: Map tiles by Stamen Design, under CC BY 3.0. Data by OpenStreetMap, under CC BY SA.
+
