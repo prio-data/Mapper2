@@ -3,11 +3,29 @@ Update to ViewsMapper1: new functionality includes customizable scaling and labe
 
 Pip install views_mapper2 in the terminal window
 
-current latest version: 0.3.0 (Available 6/28/2022)
+current latest version: 1.6.0 (Available 9/6/2022)
 
 
 Attribution: 
-Background tiles provided by Stamen:
-Toner map: Map tiles by Stamen Design, under CC BY 3.0. Data by OpenStreetMap, under ODbL.
-Watercolor map: Map tiles by Stamen Design, under CC BY 3.0. Data by OpenStreetMap, under CC BY SA.
+    Tiles obtained through Contextily provider objects, information listed below
+
+    OpenTopoMap
+        url: https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png
+        html_attribution: Map data: © OpenStreetMap contributors, SRTM | Map style: © OpenTopoMap (CC-BY-SA)
+        attribution: Map data: (C) OpenStreetMap contributors, SRTM | Map style: (C) OpenTopoMap (CC-BY-SA)
+
+    OpenStreetMap.Mapnik
+        url: https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png
+        html_attribution: © OpenStreetMap contributors
+        attribution: (C) OpenStreetMap contributors
+
+    Stamen
+        url: https://stamen-tiles-{s}.a.ssl.fastly.net/{variant}/{z}/{x}/{y}{r}.{ext}
+        html_attribution: Map tiles by Stamen Design, CC BY 3.0 — Map data © OpenStreetMap contributors
+        attribution: Map tiles by Stamen Design, CC BY 3.0 -- Map data (C) OpenStreetMap contributors
+
+    CartoDB
+        url: https://{s}.basemaps.cartocdn.com/{variant}/{z}/{x}/{y}{r}.png
+        html_attribution: © OpenStreetMap contributors © CARTO
+        attribution: (C) OpenStreetMap contributors (C) CARTO
 

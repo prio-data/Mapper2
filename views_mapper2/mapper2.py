@@ -18,8 +18,11 @@ class Mapper2:
     Map scale sets the scales to a custom range, displays values of the variable as is.
     Map dictionary sets both scale and labels to custom.
     Map dictionary writer can be used to create dictionaries from scale values.
-    Background allows for Background map and labels sandwiching of the map using the Standard Stamen Design tiles
-    from  Open Street Map project.
+    Background allows for Background map and labels sandwiching of the map using multiple providers from the OpenStreetMap project. Including the OpenStreetMap.Mapnik, Stamen design and CartoDB projects.
+    transparency: on a scale from 0 to 1, transparency communicates with the sidebar, works well in combination with preset background maps
+    views_experimental_labels: displays country names, some issue with label collision for multiple countries
+            choose numeric value for font size
+
 
     Attributes
     ----------
@@ -30,6 +33,7 @@ class Mapper2:
     title: Optional default title at matplotlib's default size.
     figure: Optional tuple of (fig, size) to use if you want to plot into an
         already existing fig and ax, rather than making a new one.
+    cmap - color map, can be chosen at a later stage, defaults to rainbow
     """
 
     def __init__(
@@ -69,7 +73,7 @@ class Mapper2:
             self.ax.set_xlim((self.bbox[0], self.bbox[1]))
             self.ax.set_ylim((self.bbox[2], self.bbox[3]))
 
-    def add_layer(self, gdf, map_scale=False, map_dictionary=None, background=None, cmap=None, **kwargs):
+    def add_layer(self, gdf, map_scale=False, map_dictionary=None, background=None, cmap=None, transparency = None, views_experimental_labels = None,  **kwargs):
         """Add a geopandas plot to a new layer.
 
         Parameters
@@ -81,9 +85,18 @@ class Mapper2:
         map_dictionary: set manual labels for the map. If missing defaults to Remco procedure
         note preferentially looking for map_dictionary, then map_scale, and then Remco default
         no need to use ticklabel and tickvalue commands as the code is subsumed within Mapper2
-        Refer to dictionary writer for easy code for
+        Refer to dictionary writer for easy code for preset dictionaries
+        transparency: on a scale from 0 to 1, transparency communicates with the sidebar
+        views_experimental_labels: displays country names, some issue with label collision for multiple countries
+            choose numeric value for font size
         **kwargs: Geopandas `.plot` keyword arguments.
         """
+
+        if transparency is not None:
+            alpha_value = transparency
+        else:
+            alpha_value = 1
+
         if "color" in kwargs:
             colormap = None
         else:
@@ -102,26 +115,71 @@ class Mapper2:
 
                 if map_dictionary is not None:
                     Mapper2.add_colorbar(self, colormap, min(map_dictionary.values()), max(map_dictionary.values()),
-                                         tickparams=map_dictionary)
+                                         tickparams=map_dictionary, transparency = alpha_value)
                 else:
                     try:
-                        Mapper2.add_colorbar(self, colormap, min(map_scale), max(map_scale))
+                        Mapper2.add_colorbar(self, colormap, min(map_scale), max(map_scale), transparency = alpha_value)
                     except:
-                        Mapper2.add_colorbar(self, colormap, self.vmin, self.vmax)
+                        Mapper2.add_colorbar(self, colormap, self.vmin, self.vmax, transparency = alpha_value)
 
         if map_dictionary is not None:
-            self.ax = gdf.plot(ax=self.ax, cmap=colormap, vmin=min(map_dictionary.values()),
+            self.ax = gdf.plot(ax=self.ax, alpha = alpha_value, cmap=colormap, vmin=min(map_dictionary.values()),
                                vmax=max(map_dictionary.values()), **kwargs)
         else:
             try:
-                self.ax = gdf.plot(ax=self.ax, cmap=colormap, vmin=min(map_scale), vmax=max(map_scale), **kwargs)
+                self.ax = gdf.plot(ax=self.ax, alpha = alpha_value, cmap=colormap, vmin=min(map_scale), vmax=max(map_scale), **kwargs)
             except:
-                self.ax = gdf.plot(ax=self.ax, cmap=colormap, **kwargs)
+                self.ax = gdf.plot(ax=self.ax, alpha = alpha_value, cmap=colormap, **kwargs)
 
         if background is not None:
             Mapper2.add_background(self, gdf, background)
 
+        if views_experimental_labels is not None:
+            Mapper2.add_views_experimental_labels(self, gdf, views_experimental_labels)
+
         return self
+
+    def add_mask(self, gdf, masking_location, map_dictionary, background=None, cmap=None, transparency = None, views_experimental_labels = None,  **kwargs):
+
+        #this function creates a mask to overlay over the other things
+        #it is identical to the previous add_layer function
+        #with exception of masking location
+        #please note that you have to use a map_dictionary, as there is only one value so scale must be created
+
+        if masking_location == 'globe':
+            data_to_use = gdf
+        elif masking_location == 'africa':
+            data_to_use = gdf[(gdf['in_africa'] == 1)]
+        elif masking_location == 'ame':
+            data_to_use = gdf[(gdf['in_africa'] == 1) | (gdf['in_me'] == 1)]
+        else:
+            data_to_use = gdf[gdf.index == masking_location]
+
+        if transparency is not None:
+            alpha_value = transparency
+        else:
+            alpha_value = 1
+
+        if "color" in kwargs:
+            colormap = None
+        else:
+            colormap = 'rainbow' if cmap is None else cmap
+
+        Mapper2.add_colorbar(self, colormap, min(map_dictionary.values()), max(map_dictionary.values()), tickparams=map_dictionary, transparency = alpha_value)
+
+        self.ax = data_to_use.plot(ax=self.ax, alpha=alpha_value, cmap=colormap, vmin=min(map_dictionary.values()),
+                           vmax=max(map_dictionary.values()), **kwargs)
+
+        if background is not None:
+            Mapper2.add_background(self, gdf, background)
+
+        if views_experimental_labels is not None:
+            Mapper2.add_views_experimental_labels(self, gdf, views_experimental_labels)
+
+        return self
+
+
+
 
     def add_colorbar(
             self,
@@ -131,7 +189,7 @@ class Mapper2:
             location="right",
             size="5%",
             pad=0.1,
-            alpha=1,
+            transparency = None,
             labelsize=16,
             tickparams=None,
     ):
@@ -154,10 +212,11 @@ class Mapper2:
         tickparams: Dictionary containing value-label pairs. For example:
             {0.05: "5%", 0.1: "10%"}
         """
+
         norm = plt.Normalize(vmin, vmax)
         if isinstance(cmap, str):
             cmap = plt.get_cmap(cmap)
-        cmap = color.force_alpha_colormap(cmap=cmap, alpha=alpha)
+        cmap = color.force_alpha_colormap(cmap=cmap, alpha=transparency)
         scalar_to_rgba = plt.cm.ScalarMappable(cmap=cmap, norm=norm)
         divider = make_axes_locatable(self.ax)
         self.cax = divider.append_axes(location, size, pad)
@@ -198,10 +257,26 @@ class Mapper2:
         return self
 
     def add_background(self, gdf, background):
-        # this uses the Stamen build in maps
-        if background == 'grey':
+        if background == 'OpenTopoMap':
+            ctx.add_basemap(self.ax, crs=gdf.crs.to_string(), source=ctx.providers.OpenTopoMap)
+        if background == 'OpenStreetMap':
+            ctx.add_basemap(self.ax, crs=gdf.crs.to_string(), source=ctx.providers.OpenStreetMap.Mapnik)
+        if background == 'StamenLite':
             ctx.add_basemap(self.ax, crs=gdf.crs.to_string(), source=ctx.providers.Stamen.TonerLite)
             ctx.add_basemap(self.ax, crs=gdf.crs.to_string(), source=ctx.providers.Stamen.TonerLabels)
-        if background == 'color':
+        if background == 'StamenWatercolor':
             ctx.add_basemap(self.ax, crs=gdf.crs.to_string(), source=ctx.providers.Stamen.Watercolor)
             ctx.add_basemap(self.ax, crs=gdf.crs.to_string(), source=ctx.providers.Stamen.TonerLabels)
+        if background == 'StamenTerrain':
+            ctx.add_basemap(self.ax, crs=gdf.crs.to_string(), source=ctx.providers.Stamen.Terrain)
+        if background == 'StamenTerrainBackground':
+            ctx.add_basemap(self.ax, crs=gdf.crs.to_string(), source=ctx.providers.Stamen.TerrainBackground)
+        if background == 'CartoDBPositron':
+            ctx.add_basemap(self.ax, crs=gdf.crs.to_string(), source=ctx.providers.CartoDB.PositronNoLabels)
+            ctx.add_basemap(self.ax, crs=gdf.crs.to_string(), source=ctx.providers.CartoDB.PositronOnlyLabels)
+        if background == 'CartoDBVoyager':
+            ctx.add_basemap(self.ax, crs=gdf.crs.to_string(), source=ctx.providers.CartoDB.VoyagerNoLabels)
+            ctx.add_basemap(self.ax, crs=gdf.crs.to_string(), source=ctx.providers.CartoDB.VoyagerOnlyLabels)
+
+    def add_views_experimental_labels(self, gdf, font):
+        gdf.apply(lambda x: self.ax.annotate(text=x['name'], xy=x.geom.centroid.coords[0], ha='center', size=font, annotation_clip = True, clip_on = True), axis=1)

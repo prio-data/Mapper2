@@ -217,14 +217,14 @@ def add_textbox_to_ax(
 
     # Define a 1st position to annotate.
     xy = (urlcoords[0][0], urlcoords[1][1])
-    imagebox = OffsetImage(logo_views, zoom=0.2)
+    imagebox = OffsetImage(logo_views, zoom=0.25)
     imagebox.image.axes = ax
 
     ab = AnnotationBbox(
         imagebox,
         xy,
         xycoords="data",
-        xybox=(55, 20),  # Arbitrary offset in points that looks ok.
+        xybox=(107, 25),  # Arbitrary offset in points that looks ok.
         frameon=False,
         boxcoords="offset points",
     )
