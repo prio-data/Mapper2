@@ -5,6 +5,8 @@ Pip install views_mapper2 in the terminal window
 
 current latest version: 1.6.0 (Available 9/6/2022)
 
+Please note that the showcase notebook is split into several parts for ease of navigating the different functionalities.
+
 
 Attribution: 
     Tiles obtained through Contextily provider objects, information listed below
