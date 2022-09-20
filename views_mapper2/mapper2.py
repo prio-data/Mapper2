@@ -153,7 +153,7 @@ class Mapper2:
         elif masking_location == 'ame':
             data_to_use = gdf[(gdf['in_africa'] == 1) | (gdf['in_me'] == 1)]
         else:
-            data_to_use = gdf[gdf.index == masking_location]
+            data_to_use = gdf[gdf['name'] == masking_location]
 
         if transparency is not None:
             alpha_value = transparency
@@ -274,7 +274,7 @@ class Mapper2:
         if background == 'CartoDBPositron':
             ctx.add_basemap(self.ax, crs=gdf.crs.to_string(), source=ctx.providers.CartoDB.PositronNoLabels)
             ctx.add_basemap(self.ax, crs=gdf.crs.to_string(), source=ctx.providers.CartoDB.PositronOnlyLabels)
-        if background == 'CartoDBVoyager':
+        if background == '""CartoDBVoyager""':
             ctx.add_basemap(self.ax, crs=gdf.crs.to_string(), source=ctx.providers.CartoDB.VoyagerNoLabels)
             ctx.add_basemap(self.ax, crs=gdf.crs.to_string(), source=ctx.providers.CartoDB.VoyagerOnlyLabels)
 
