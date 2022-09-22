@@ -48,7 +48,7 @@ def cid2name(country_id):
     :param country_id: Views Country ID
     :return: name
     """
-    name = print(Country(country_id).name)
+    name = Country(country_id).name
     return name
 
 def name2iso(country):
