@@ -62,5 +62,5 @@ def bbox_from_cid_region(country_id):
         gdf_master = gdf_master.to_crs(4326)
         multipolygon = gdf_master.loc[gdf_master['country_id'] == country_id].geom
         bbox1 = multipolygon.total_bounds
-        bbox = [round((bbox1[0]-6), 1), round((bbox1[2]+6), 1), round((bbox1[1]-6), 1), round((bbox1[3]+6), 1)]
+        bbox = [round((bbox1[0]-3), 1), round((bbox1[2]+3), 1), round((bbox1[1]-3), 1), round((bbox1[3]+3), 1)]
     return bbox

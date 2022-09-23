@@ -3,7 +3,7 @@ Update to ViewsMapper1: new functionality includes customizable scaling and labe
 
 Pip install views_mapper2 in the terminal window
 
-current latest version: 1.7.1 (Available 9/22/2022)
+current latest version: 1.8.8 (Available 9/23/2022)
 
 Please note that the showcase notebook is split into several parts for ease of navigating the different functionalities.
 
