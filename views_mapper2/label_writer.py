@@ -207,15 +207,15 @@ def make_folders_complete_set(main_folderpath):
 
 #this looks for the violence type, note requires that a variable has _sb at the end
 def find_the_violence_type(string):
-    if string.endswith('_sb'): output = 'state-based violence'
-    elif string.endswith('_ns'): output = 'non-state violence'
-    elif string.endswith('_os'): output = 'one-sided violence'
+    if string.count('_sb')>0: output = 'state-based violence'
+    elif string.count('_ns')>0: output = 'non-state violence'
+    elif string.count('_os')>0: output = 'one-sided violence'
     else: output = 'please check the variable name'
     return output
 
 def give_me_violence_string_label_only(string):
-    if string.endswith('_sb'): output = '_sb'
-    elif string.endswith('_ns'): output = '_ns'
-    elif string.endswith('_os'): output = '_os'
+    if string.count('_sb')>0: output = '_sb'
+    elif string.count('_ns')>0: output = '_ns'
+    elif string.count('_os'): output = '_os'
     else: output = 'please check the variable name'
     return output

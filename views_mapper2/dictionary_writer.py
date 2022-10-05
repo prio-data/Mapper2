@@ -68,10 +68,10 @@ dictionary_dichotomous_stand = norm_dict(dichotomous_scale_0_1)
 
 #takes a variable name in string form and determines which dictionary to use
 def find_the_dictionary(string, dictionary_0, dictionary_log1, dictionary_log2):
-    if string.startswith('ln1'):
+    if string.count('ln1')>0:
         output = dictionary_log1
         name = 'log_transformed_dictionary'
-    elif string.startswith('ln2'):
+    elif string.count('ln2')>0:
         output = dictionary_log2
         name = 'log2_transformed_dictionary'
     else:
