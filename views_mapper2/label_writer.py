@@ -8,6 +8,7 @@ from ingester3.Country import Country
 import pycountry
 from datetime import date
 import os
+import numpy as np
 
 
 def vid2date(month_id):
@@ -101,50 +102,70 @@ def name_date2cid(country, date_string):
             output= 'check_spelling'
     return output
 
-def give_me_top10_country_id(df, month_value, var_name):
+def give_me_top10_country_id(df, month_value, var_name, variable_transformation):
     """the dataframe must contain month_id and country_id columns with those names"""
-    df = df.reset_index()
-    df = df.set_index(['country_id', 'month_id'])
-    temp = df.iloc[df.index.get_level_values('month_id') == month_value]
-    temp2 = temp.nlargest(10, str(var_name))
-    output = list(temp2.groupby('country_id').groups.keys())
+    if variable_transformation == 'actual':
+        temp = df.reset_index()
+        temp = temp.set_index(['country_id', 'month_id'])
+        temp2 = temp.iloc[temp.index.get_level_values('month_id') == month_value]
+        temp3 = temp2.nlargest(10, str(var_name)).reset_index()
+        output = list(temp3['country_id'])
+    elif variable_transformation == 'ln1':
+        temp = df.reset_index()
+        temp = temp.set_index(['country_id', 'month_id'])
+        temp['actual'] = np.exp(temp[var_name]) - 1
+        temp2 = temp.iloc[temp.index.get_level_values('month_id') == month_value]
+        temp3 = temp2.nlargest(10, str('actual')).reset_index()
+        output = list(temp3['country_id'])
+    else: output = 'function works for actual or single ln transformed variables only'
     return output
 
-def give_me_topX_country_id_cumulative(df, time_index, number_wanted, variable, start, end):
-    df = df.reset_index()
-    df = df.set_index(['country_id', str(time_index)])
-    time_wanted = list(range(start, end+1))
-    temp = df[df.index.get_level_values(str(time_index)).isin(time_wanted)]
-    temp2 = pd.DataFrame(temp.groupby('country_id').agg({str(variable):'sum'}))
-    temp3 = temp2.nlargest(number_wanted, str(variable))
-    output = list(temp3.groupby('country_id').groups.keys())
+
+def give_me_topX_country_id_cumulative(df, time_index, number_wanted, variable, start, end, variable_transformation):
+    if variable_transformation == 'actual':
+        temp = df.reset_index()
+        temp = temp.set_index(['country_id', str(time_index)])
+        time_wanted = list(range(start, end + 1))
+        temp2 = temp[temp.index.get_level_values(str(time_index)).isin(time_wanted)]
+        temp3 = pd.DataFrame(temp2.groupby('country_id').agg({str(variable): 'sum'}))
+        temp4 = temp3.nlargest(number_wanted, str(variable)).reset_index()
+        output = list(temp4['country_id'])
+    elif variable_transformation == 'ln1':
+        temp = df.reset_index()
+        temp = temp.set_index(['country_id', str(time_index)])
+        temp['actual'] = np.exp(temp[variable]) - 1
+        time_wanted = list(range(start, end + 1))
+        temp2 = temp[temp.index.get_level_values(str(time_index)).isin(time_wanted)]
+        temp3 = pd.DataFrame(temp2.groupby('country_id').agg({str('actual'): 'sum'}))
+        temp4 = temp3.nlargest(number_wanted, str('actual')).reset_index()
+        output = list(temp4['country_id'])
+    else:
+        output = 'function works for actual or single ln transformed variables'
     return output
 
-def give_me_top10_names(df, month_value, var_name):
+def give_me_top10_names(df, month_value, var_name, variable_transformation):
     """the dataframe must contain month_id and country_id columns with those names"""
-    df = df.reset_index()
-    df = df.set_index(['country_id', 'month_id'])
-    temp = df.iloc[df.index.get_level_values('month_id') == month_value]
-    temp2 = temp.nlargest(10, str(var_name))
+    temp = df.copy()
+    temp_list = give_me_top10_country_id(df = temp, month_value = month_value, var_name = var_name, variable_transformation=variable_transformation)
 
-    list_1 = list()
-    for i in list(temp2.groupby('country_id').groups.keys()):
-        list_1.append(Country(i).name)
-    output = list_1
+    try:
+        list_1 = list()
+        for i in temp_list:
+            list_1.append(Country(i).name)
+        output = list_1
+    except: output = temp_list
     return output
 
-def give_me_topX_country_names_cumulative(df, time_index, number_wanted, variable, start, end):
-    df = df.reset_index()
-    df = df.set_index(['country_id', str(time_index)])
-    time_wanted = list(range(start, end+1))
-    temp = df[df.index.get_level_values(str(time_index)).isin(time_wanted)]
-    temp2 = pd.DataFrame(temp.groupby('country_id').agg({str(variable):'sum'}))
-    temp3 = temp2.nlargest(number_wanted, str(variable))
+def give_me_topX_country_names_cumulative(df, time_index, number_wanted, variable, start, end, variable_transformation):
+    temp = df.copy()
+    temp_list = give_me_topX_country_id_cumulative(df=temp, time_index = time_index, number_wanted = number_wanted, variable = variable, start = start, end = end, variable_transformation= variable_transformation)
 
-    list_1 = list()
-    for i in list(temp3.groupby('country_id').groups.keys()):
-        list_1.append(Country(i).name)
-    output = list_1
+    try:
+        list_1 = list()
+        for i in temp_list:
+            list_1.append(Country(i).name)
+        output = list_1
+    except: output = temp_list
 
     return output
 

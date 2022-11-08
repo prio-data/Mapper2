@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "views_mapper2"
-version = "1.9.0"
+version = "1.10.0"
 description = "Mapper version 2 for viewser"
 authors = ["Malika <malikarakh@gmail.com>"]
 
