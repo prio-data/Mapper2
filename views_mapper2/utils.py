@@ -194,7 +194,7 @@ def add_textbox_to_ax(
         boxstyle="square, pad=0",
     )
     text_url = ax.annotate(
-        "http://views.pcr.uu.se",
+        "https://viewsforecasting.org/",
         xy=cornerparams[corner]["xy"],
         xytext=cornerparams[corner]["offset"],
         textcoords="offset points",
