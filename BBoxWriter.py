@@ -21,10 +21,8 @@ def bbox_from_cid(country_id):
     BBOX_AME = [-18.5, 64.0, -35.5, 43.0]
     BBOX_ME= [19.0, 64.0, 11.0, 43.0]
     
-    raise ValueError("This code is actually in use")
-    
     bbox = None
-    country_id = country_id.lower()
+#    country_id = country_id.lower()
 
     if country_id == 'africa':
         bbox = BBOX_AFRICA
@@ -58,7 +56,7 @@ def bbox_from_cid_region(country_id):
     BBOX_AME = [-18.5, 64.0, -35.5, 43.0]
     BBOX_ME= [19.0, 64.0, 11.0, 43.0]
     
-    country_id = country_id.lower()
+#    country_id = country_id.lower()
 
     if country_id == 'africa':
         bbox = BBOX_AFRICA
